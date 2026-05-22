@@ -46,7 +46,7 @@ export function verifyBasicAuthHeader(
   return diff === 0;
 }
 
-/** WWW-Authenticate response body + headers for a 401 challenge. */
+/** WWW-Authenticate response for API clients that send Authorization headers. */
 export function basicAuthChallenge(): {
   status: number;
   body: string;
@@ -60,4 +60,25 @@ export function basicAuthChallenge(): {
       "Content-Type": "text/plain",
     },
   };
+}
+
+/** The cookie name used to store the auth token. */
+export const AUTH_COOKIE = "shri_auth";
+
+/** Build the base64 token stored in the cookie (without "Basic " prefix). */
+export function makeCookieToken(creds: BasicAuthCreds): string {
+  const raw = `${creds.user}:${creds.pass}`;
+  if (typeof Buffer !== "undefined") {
+    return Buffer.from(raw, "utf8").toString("base64");
+  }
+  return btoa(raw);
+}
+
+/** Verify a raw cookie token against the configured creds. */
+export function verifyCookieToken(
+  token: string | null | undefined,
+  creds: BasicAuthCreds,
+): boolean {
+  if (!token) return false;
+  return verifyBasicAuthHeader(`Basic ${token}`, creds);
 }
