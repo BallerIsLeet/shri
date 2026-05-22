@@ -59,6 +59,15 @@ const nextConfig = {
     // Required so Next's output-file tracer uses repo root as the base path,
     // keeping the standalone directory structure correct for the monorepo.
     outputFileTracingRoot: path.join(__dirname, '../../'),
+    // Next's file tracer follows JS require() chains but skips native .node
+    // binaries. Prisma's query engine is a .node binary — include it explicitly
+    // so it lands in the standalone output.
+    outputFileTracingIncludes: {
+      '**': [
+        '../../node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/*.node',
+        './node_modules/.pnpm/@prisma+client@*/node_modules/.prisma/client/*.node',
+      ],
+    },
     // Avoid bundling these into server bundles — they pull native deps
     // (sharp, opencv, ffmpeg) that must be loaded at runtime.
     serverComponentsExternalPackages: [
