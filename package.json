@@ -18,6 +18,9 @@
     "build:railway": "pnpm --filter @shri/${SHRI_SERVICE:-web} build",
     "start": "pnpm --filter @shri/${SHRI_SERVICE:-web} start"
   },
+  "pnpm": {
+    "neverBuiltDependencies": ["@u4/opencv4nodejs"]
+  },
   "devDependencies": {
     "@types/node": "^20.11.0",
     "concurrently": "^8.2.2",
