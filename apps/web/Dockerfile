@@ -34,7 +34,7 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Regenerate Prisma client for this OS/arch in case postinstall didn't run
-RUN pnpm --filter @shri/db prisma:generate
+RUN node_modules/.bin/prisma generate --schema=packages/db/prisma/schema.prisma
 
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm --filter @shri/web build
