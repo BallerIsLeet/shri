@@ -1,15 +1,12 @@
-# Single root config used by both Railway services (web + worker).
-# Each service selects its target package via the SHRI_SERVICE env var:
-#   web service:    SHRI_SERVICE=web    (or unset — web is the default)
-#   worker service: SHRI_SERVICE=worker
-#
-# The web service should additionally set healthcheckPath=/api/healthz
-# in the Railway dashboard (Settings → Health Check).
+# Project-level service registry.
+# Each service picks up its own build/deploy config from apps/{name}/railway.toml.
+# Docker build context is always the repo root, so Dockerfiles can COPY
+# files from anywhere in the monorepo.
 
-[build]
-builder = "nixpacks"
-buildCommand = "pnpm install --frozen-lockfile && pnpm run build:railway"
+[[services]]
+name = "web"
+source = "apps/web"
 
-[deploy]
-startCommand = "pnpm start"
-restartPolicyType = "always"
+[[services]]
+name = "worker"
+source = "apps/worker"

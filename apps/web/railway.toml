@@ -1,0 +1,7 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "apps/web/Dockerfile"
+
+[deploy]
+healthcheckPath = "/api/healthz"
+restartPolicyType = "always"

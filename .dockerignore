@@ -1,0 +1,25 @@
+# Dependencies (reinstalled inside the image)
+node_modules
+**/node_modules
+
+# Build output
+**/.next
+**/dist
+**/*.tsbuildinfo
+
+# Local env files (never bake secrets into an image)
+.env
+.env.*
+!.env.example
+
+# Dev tooling
+**/.turbo
+**/.cache
+
+# Git
+.git
+.gitignore
+
+# Docs / misc
+*.md
+!README.md
