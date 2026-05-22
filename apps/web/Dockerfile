@@ -30,9 +30,11 @@ RUN apk add --no-cache openssl
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 WORKDIR /app
 
-COPY --from=deps /app/node_modules             ./node_modules
-# prisma CLI is a devDep of @shri/db so pnpm scopes it to that package's node_modules
+COPY --from=deps /app/node_modules              ./node_modules
+# pnpm scopes package-local binaries into each workspace package's own node_modules.
+# Copy the ones we need: prisma (devDep of @shri/db) and next (dep of @shri/web).
 COPY --from=deps /app/packages/db/node_modules ./packages/db/node_modules
+COPY --from=deps /app/apps/web/node_modules    ./apps/web/node_modules
 COPY . .
 
 # Regenerate Prisma client for this OS/arch in case postinstall didn't run
