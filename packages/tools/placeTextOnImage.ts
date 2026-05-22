@@ -16,9 +16,10 @@
 // (and the pure-function unit tests) can run on machines without it.
 
 import { z } from "zod";
-import sharp from "sharp";
 import satori from "satori";
-import { Resvg } from "@resvg/resvg-js";
+// sharp and Resvg are imported lazily inside handler functions to avoid loading
+// native binaries at module-init time (Next.js build loads this module during
+// "Collecting page data" but never calls handlers).
 import { getObject, keys, putObject, publicUrlFor } from "@shri/storage";
 import { type SatoriElement, type SatoriFont, loadFonts } from "./renderJsxCarousel.js";
 import type { ToolContext } from "./descriptors.js";
@@ -404,6 +405,7 @@ async function renderOverlayPng(
     height: imageH,
     fonts,
   } as unknown as SatoriArgs[1]);
+  const { Resvg } = await import("@resvg/resvg-js");
   const png = new Resvg(svg, { fitTo: { mode: "width", value: imageW } })
     .render()
     .asPng();
@@ -419,6 +421,7 @@ export async function placeTextOnImage(
   const input = inputSchema.parse(rawInput);
 
   const baseBuf = await getObject(input.baseR2Key);
+  const sharp = (await import("sharp")).default;
   const meta = await sharp(baseBuf).metadata();
   const imageW = meta.width ?? 0;
   const imageH = meta.height ?? 0;

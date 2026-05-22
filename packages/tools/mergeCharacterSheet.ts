@@ -11,9 +11,10 @@
 //      Character row with sheetR2Key + status="READY".
 
 import { z } from "zod";
-import sharp from "sharp";
 import satori from "satori";
-import { Resvg } from "@resvg/resvg-js";
+// sharp and Resvg are imported lazily inside handler functions to avoid loading
+// native binaries at module-init time (Next.js build loads this module during
+// "Collecting page data" but never calls handlers).
 import { getObject, keys, publicUrlFor, putObject } from "@shri/storage";
 import { prisma } from "@shri/db";
 import { type SatoriElement, loadFonts } from "./renderJsxCarousel.js";
@@ -97,6 +98,7 @@ async function renderLabelStrip(label: string, width: number): Promise<Buffer> {
     height: LABEL_STRIP_H,
     fonts,
   } as unknown as SatoriArgs[1]);
+  const { Resvg } = await import("@resvg/resvg-js");
   const png = new Resvg(svg, { fitTo: { mode: "width", value: width } })
     .render()
     .asPng();
@@ -107,6 +109,7 @@ async function buildTile(
   viewBuf: Buffer,
   label: string,
 ): Promise<Buffer> {
+  const sharp = (await import("sharp")).default;
   // Resize the view to TILE_IMAGE_SIZE square; flatten any alpha onto white
   // so the sheet has a consistent background under JPEG.
   const resized = await sharp(viewBuf)
@@ -201,6 +204,7 @@ export async function mergeCharacterSheet(
     };
   });
 
+  const sharp = (await import("sharp")).default;
   let sheet = sharp({
     create: {
       width: canvasW,

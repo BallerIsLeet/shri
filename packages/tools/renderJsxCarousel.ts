@@ -15,7 +15,9 @@ import { promises as fs } from "node:fs";
 import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import satori from "satori";
-import { Resvg } from "@resvg/resvg-js";
+// Resvg is imported lazily inside renderSlideToPng to avoid loading the
+// native binary at module-init time (the Next.js build loads this module
+// during "Collecting page data" but never calls handlers).
 
 // Satori 0.10's Font shape (the `fonts` array element).
 export type SatoriFont = {
@@ -336,6 +338,7 @@ export async function renderSlideToPng(
     height: slide.height,
     fonts,
   } as unknown as SatoriArgs[1]);
+  const { Resvg } = await import("@resvg/resvg-js");
   const png = new Resvg(svg, {
     fitTo: { mode: "width", value: slide.width },
   })
