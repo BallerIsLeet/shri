@@ -1,0 +1,29 @@
+{
+  "name": "@shri/mcp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "start": "tsx src/index.ts",
+    "build": "echo 'mcp runs via tsx in dev/start; no build step' && exit 0",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run --passWithNoTests",
+    "lint": "eslint src --max-warnings=0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "@shri/ai": "workspace:*",
+    "@shri/db": "workspace:*",
+    "@shri/prompts-fs": "workspace:*",
+    "@shri/seedance": "workspace:*",
+    "@shri/storage": "workspace:*",
+    "@shri/tools": "workspace:*",
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0",
+    "vitest": "^1.4.0"
+  }
+}

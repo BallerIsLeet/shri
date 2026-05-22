@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022"],
+    "strict": true,
+    "noImplicitAny": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@shri/db": ["packages/db/src/index.ts"],
+      "@shri/storage": ["packages/storage/src/index.ts"],
+      "@shri/seedance": ["packages/seedance/src/index.ts"],
+      "@shri/ai": ["packages/ai/src/index.ts"],
+      "@shri/prompts-fs": ["packages/prompts-fs/src/index.ts"],
+      "@shri/tools": ["packages/tools/index.ts"],
+      "@shri/orchestrator": ["packages/orchestrator/src/index.ts"]
+    }
+  },
+  "files": []
+}

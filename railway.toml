@@ -1,0 +1,10 @@
+# Per-service config lives at apps/{name}/railway.toml.
+# This root file is the project-level manifest.
+
+[[services]]
+name = "web"
+source = "apps/web"
+
+[[services]]
+name = "worker"
+source = "apps/worker"

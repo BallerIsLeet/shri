@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build artifacts
+dist/
+build/
+*.tsbuildinfo
+
+# Prisma generated client
+packages/db/generated/
+packages/db/node_modules/
+
+# Env
+.env
+.env.*
+!.env.example
+
+# Per-project prompts (local dev volume)
+prompts-projects/
+
+# IDE / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Test artifacts
+coverage/
+.vitest/
+
+# Misc
+.turbo/
+.next/
+.cache/
+tmp/

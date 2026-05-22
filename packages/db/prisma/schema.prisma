@@ -1,0 +1,264 @@
+// Shri — Prisma schema.
+// Annotated in docs/08-storage-and-data.md.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===== Enums =====
+
+enum AssetKind {
+  ICON
+  SCREENSHOT
+  SCREEN_RECORDING
+  LOGO
+  REFERENCE
+}
+
+enum BriefStatus {
+  DRAFTING
+  READY
+  ARCHIVED
+}
+
+enum ContentType {
+  CAROUSEL_CANVA
+  CAROUSEL_TEXT_OVERLAY
+  REEL
+}
+
+enum Platform {
+  TIKTOK
+  REELS
+  SHORTS
+  IG_FEED
+  X
+}
+
+enum ItemStatus {
+  PROPOSED
+  SELECTED
+  GENERATING
+  READY
+  FAILED
+}
+
+enum JobKind {
+  BRIEF
+  CAROUSEL
+  REEL
+  POLLING_TICK
+}
+
+enum JobStatus {
+  QUEUED
+  RUNNING
+  DONE
+  FAILED
+}
+
+enum CharacterStatus {
+  DRAFTING
+  GENERATING
+  READY
+  FAILED
+}
+
+enum CharacterBasisMode {
+  FORM
+  CHAT
+}
+
+enum CrawlStatus {
+  QUEUED
+  RUNNING
+  DONE
+  FAILED
+}
+
+// ===== Models =====
+
+model Project {
+  id                  String         @id @default(cuid())
+  slug                String         @unique
+  name                String
+  description         String
+  highlights          String
+  websiteUrl          String?
+  crawlJson           Json?
+  promptsGeneratedAt  DateTime?
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  assets              Asset[]
+  briefs              Brief[]
+  items               ContentItem[]
+  characters          Character[]
+  crawls              ProjectCrawl[]
+
+  @@index([slug])
+}
+
+model ProjectCrawl {
+  id          String      @id @default(cuid())
+  projectId   String
+  url         String
+  status      CrawlStatus @default(QUEUED)
+  pagesJson   Json?
+  profileJson Json?
+  error       String?
+  createdAt   DateTime    @default(now())
+
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model Asset {
+  id        String    @id @default(cuid())
+  projectId String
+  kind      AssetKind
+  r2Key     String
+  mimeType  String
+  width     Int?
+  height    Int?
+  durationS Float?
+  caption   String?
+  createdAt DateTime  @default(now())
+
+  project   Project   @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+model Brief {
+  id          String        @id @default(cuid())
+  projectId   String
+  status      BriefStatus   @default(DRAFTING)
+  rangeDays   Int
+  estCostUsd  Float          @default(0)
+  rawJson     Json
+  createdAt   DateTime       @default(now())
+
+  project     Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  items       ContentItem[]
+
+  @@index([projectId])
+}
+
+model ContentItem {
+  id              String                 @id @default(cuid())
+  projectId       String
+  briefId         String
+  type            ContentType
+  // Native Postgres enum array — gives Phase B/C consumers compile-time
+  // safety. Prisma only emits the `Platform` enum into the generated client
+  // when it's used as a typed field, hence the array rather than `Json`.
+  platform        Platform[]
+  ratio           String
+  hook            String
+  aiConceptJson   Json
+  conceptJson     Json
+  conceptRevision Int                    @default(0)
+  status          ItemStatus             @default(PROPOSED)
+  estCostUsd      Float                  @default(0)
+  createdAt       DateTime               @default(now())
+  updatedAt       DateTime               @updatedAt
+
+  project         Project                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  brief           Brief                  @relation(fields: [briefId], references: [id], onDelete: Cascade)
+  outputs         ContentOutput[]
+  jobs            Job[]
+  characters      ContentItemCharacter[]
+
+  @@index([projectId])
+  @@index([briefId])
+}
+
+model ContentOutput {
+  id         String      @id @default(cuid())
+  itemId     String
+  r2Key      String
+  thumbR2Key String?
+  caption    String
+  meta       Json
+  createdAt  DateTime    @default(now())
+
+  item       ContentItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@index([itemId])
+}
+
+model Job {
+  id             String       @id @default(cuid())
+  itemId         String?
+  kind           JobKind
+  bullJobId      String
+  seedanceTaskId String?
+  status         JobStatus    @default(QUEUED)
+  costUsd        Float?
+  logs           Json         @default("[]")
+  error          String?
+  startedAt      DateTime?
+  finishedAt     DateTime?
+  createdAt      DateTime     @default(now())
+
+  item           ContentItem? @relation(fields: [itemId], references: [id], onDelete: SetNull)
+
+  @@index([itemId])
+  @@index([bullJobId])
+}
+
+model Character {
+  id          String                 @id @default(cuid())
+  projectId   String
+  name        String
+  species     String?
+  age         String?
+  gender      String?
+  visualStyle String?
+  description String
+  basisMode   CharacterBasisMode     @default(FORM)
+  chatJson    Json?
+  baseR2Key   String?
+  sheetR2Key  String?
+  status      CharacterStatus        @default(DRAFTING)
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  project     Project                @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  views       CharacterView[]
+  items       ContentItemCharacter[]
+
+  @@index([projectId])
+}
+
+model CharacterView {
+  id          String    @id @default(cuid())
+  characterId String
+  pose        String
+  r2Key       String
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@index([characterId])
+}
+
+model ContentItemCharacter {
+  contentItemId String
+  characterId   String
+  role          String?
+
+  contentItem   ContentItem @relation(fields: [contentItemId], references: [id], onDelete: Cascade)
+  character     Character   @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@id([contentItemId, characterId])
+  @@index([characterId])
+}
