@@ -16,6 +16,8 @@ const nextConfig = {
     "@shri/ai",
     "@shri/prompts-fs",
     "@shri/tools",
+    "@shri/orchestrator",
+    "@shri/seedance",
   ],
   // Avoid bundling these into edge/server bundles — they pull native deps
   // (sharp, opencv, ffmpeg) that should stay external. Next 14 spelling.
