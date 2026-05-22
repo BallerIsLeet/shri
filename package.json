@@ -19,7 +19,12 @@
     "start": "pnpm --filter @shri/${SHRI_SERVICE:-web} start"
   },
   "pnpm": {
-    "neverBuiltDependencies": ["@u4/opencv4nodejs"]
+    "neverBuiltDependencies": ["@u4/opencv4nodejs"],
+    "supportedArchitectures": {
+      "os": ["current", "linux"],
+      "cpu": ["current", "x64"],
+      "libc": ["current", "musl"]
+    }
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

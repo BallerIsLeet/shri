@@ -42,7 +42,12 @@ COPY . .
 # Regenerate Prisma client for this OS/arch in case postinstall didn't run
 RUN packages/db/node_modules/.bin/prisma generate --schema=packages/db/prisma/schema.prisma
 
-ENV NEXT_TELEMETRY_DISABLED=1
+# next build imports @shri/db which instantiates PrismaClient at module-load
+# time. Prisma v5 throws "Environment variable not found: DATABASE_URL" if the
+# var is absent — even though no query ever runs during a static build. A dummy
+# syntactically-valid URL satisfies Prisma without triggering any DB connection.
+ENV NEXT_TELEMETRY_DISABLED=1 \
+    DATABASE_URL="postgresql://build@localhost/build"
 RUN pnpm --filter @shri/web build
 
 # ── Stage 3: minimal production image ────────────────────────────────────────
