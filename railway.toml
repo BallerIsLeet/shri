@@ -1,10 +1,15 @@
-# Per-service config lives at apps/{name}/railway.toml.
-# This root file is the project-level manifest.
+# Single root config used by both Railway services (web + worker).
+# Each service selects its target package via the SHRI_SERVICE env var:
+#   web service:    SHRI_SERVICE=web    (or unset — web is the default)
+#   worker service: SHRI_SERVICE=worker
+#
+# The web service should additionally set healthcheckPath=/api/healthz
+# in the Railway dashboard (Settings → Health Check).
 
-[[services]]
-name = "web"
-source = "apps/web"
+[build]
+builder = "nixpacks"
+buildCommand = "pnpm install --frozen-lockfile && pnpm run build:railway"
 
-[[services]]
-name = "worker"
-source = "apps/worker"
+[deploy]
+startCommand = "pnpm start"
+restartPolicyType = "always"

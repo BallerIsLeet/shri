@@ -14,7 +14,9 @@
     "typecheck": "pnpm -r typecheck",
     "test": "pnpm -r test",
     "lint": "pnpm -r lint",
-    "build": "pnpm -r build"
+    "build": "pnpm -r build",
+    "build:railway": "pnpm --filter @shri/${SHRI_SERVICE:-web} build",
+    "start": "pnpm --filter @shri/${SHRI_SERVICE:-web} start"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

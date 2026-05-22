@@ -1,8 +1,0 @@
-[build]
-builder = "nixpacks"
-buildCommand = "pnpm install --frozen-lockfile && pnpm --filter @shri/web build"
-
-[deploy]
-startCommand = "pnpm --filter @shri/web start"
-healthcheckPath = "/api/healthz"
-restartPolicyType = "always"

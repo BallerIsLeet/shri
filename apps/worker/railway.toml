@@ -1,7 +1,0 @@
-[build]
-builder = "nixpacks"
-buildCommand = "pnpm install --frozen-lockfile && pnpm --filter @shri/worker build"
-
-[deploy]
-startCommand = "pnpm --filter @shri/worker start"
-restartPolicyType = "always"
