@@ -6,6 +6,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // Type-checking and linting are run locally / in CI — skipping inside the
+  // Docker build avoids OOM crashes in Railway's constrained build workers.
+  typescript: { ignoreBuildErrors: true },
+  eslint: { ignoreDuringBuilds: true },
   // Produce a self-contained build for Docker deployment.
   output: 'standalone',
   // Workspace packages import from source (.ts) rather than dist — Next needs
