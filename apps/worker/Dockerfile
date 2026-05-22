@@ -31,7 +31,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 # pnpm virtual store + all hoisted node_modules (includes tsx, bullmq, etc.)
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/node_modules             ./node_modules
+COPY --from=deps /app/packages/db/node_modules ./packages/db/node_modules
 
 # All TypeScript source (packages are imported as TS via workspace symlinks)
 COPY packages ./packages
@@ -41,6 +42,6 @@ COPY apps/worker ./apps/worker
 COPY package.json pnpm-workspace.yaml ./
 
 # Regenerate Prisma client for this OS/arch
-RUN node_modules/.bin/prisma generate --schema=packages/db/prisma/schema.prisma
+RUN packages/db/node_modules/.bin/prisma generate --schema=packages/db/prisma/schema.prisma
 
 CMD ["node_modules/.bin/tsx", "apps/worker/src/index.ts"]

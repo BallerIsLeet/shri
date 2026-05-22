@@ -30,11 +30,13 @@ RUN apk add --no-cache openssl
 RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
 WORKDIR /app
 
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/node_modules             ./node_modules
+# prisma CLI is a devDep of @shri/db so pnpm scopes it to that package's node_modules
+COPY --from=deps /app/packages/db/node_modules ./packages/db/node_modules
 COPY . .
 
 # Regenerate Prisma client for this OS/arch in case postinstall didn't run
-RUN node_modules/.bin/prisma generate --schema=packages/db/prisma/schema.prisma
+RUN packages/db/node_modules/.bin/prisma generate --schema=packages/db/prisma/schema.prisma
 
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm --filter @shri/web build
