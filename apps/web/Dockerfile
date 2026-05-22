@@ -32,9 +32,11 @@ WORKDIR /app
 
 COPY --from=deps /app/node_modules              ./node_modules
 # pnpm scopes package-local binaries into each workspace package's own node_modules.
-# Copy the ones we need: prisma (devDep of @shri/db) and next (dep of @shri/web).
-COPY --from=deps /app/packages/db/node_modules ./packages/db/node_modules
-COPY --from=deps /app/apps/web/node_modules    ./apps/web/node_modules
+# Copy the ones we need: prisma (devDep of @shri/db), next (dep of @shri/web),
+# and openai (dep of @shri/ai — pnpm doesn't hoist it to root node_modules).
+COPY --from=deps /app/packages/db/node_modules  ./packages/db/node_modules
+COPY --from=deps /app/packages/ai/node_modules  ./packages/ai/node_modules
+COPY --from=deps /app/apps/web/node_modules     ./apps/web/node_modules
 COPY . .
 
 # Regenerate Prisma client for this OS/arch in case postinstall didn't run
